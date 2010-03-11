@@ -79,9 +79,9 @@ This shows the tag sequence, the chromosome ID, position, strand (upstream or do
 <p>
 Because we'll want to exclude analysis of sites too close to each other (and so they would interfere with each other) we want to add a column to the data indicating distance to the neighboring site. We did this with command line perl code like the following (note that this code assumes that the upstream sites precede the downstream sites in the input file):
 </p>
-<p>
-cat CCGG_tags_18 | perl -ne 'BEGIN {$dist = 1000;} @data = split; if ($data[3] eq "-") {if ($data[1] ne $olddata[1]) { if (@olddata) { print "@olddata[0..5] 1000 $data[6]\n";}; print "@data[0..5] 1000 $data[6]\n";} else {$dist = $data[2] - $olddata[2]; print "@olddata[0..5] $dist $data[6]\n@data[0..5] $dist $data[6]\n";} }; @olddata = @data; END {print "@olddata[0..5] 1000 $data[6]\n";}' &gt CCGG_tags_18_withdist
-</p>
+<pre>
+perl dist.pl CCGG_tags_18 &gt CCGG_tags_18_withdist
+</pre>
 <p>
 This ends up looking like this:
 </p>
