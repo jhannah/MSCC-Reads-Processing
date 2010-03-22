@@ -1,0 +1,8 @@
+#!/bin/bash
+cd $PBS_O_WORKDIR
+echo "Started `date`"
+cat $PBS_NODEFILE
+NPROCS=`wc -l < $PBS_NODEFILE`
+echo $NPROCS
+[% cmd %]
+echo "Ended `date`"
