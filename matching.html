@@ -76,8 +76,8 @@ GCAGGAGCCACCTTGGTT      chr1    3010875 +       18      1       NA
 </pre>
 <p>
 This shows the tag sequence, the chromosome ID, position, strand (upstream or downstream tag), tag length, if it's repeat-masked, and MmeI site presence. The last column, MmeI site presence, is "NA" if no conflicting MmeI site is found in the flanking sequence or, if one is detected, the distance in bp to the target site. This is recorded here because if there is an MmeI site in genomic sequence it could conflict with the tag construction and so sites with MmeI sites that are too close should be excluded in later analysis (although they are potentially generated and so should be in our set of potential matches).
-<p>
-Because we'll want to exclude analysis of sites too close to each other (and so they would interfere with each other) we want to add a column to the data indicating distance to the neighboring site. We did this with command line perl code like the following (note that this code assumes that the upstream sites precede the downstream sites in the input file):
+</p><p>
+Because we'll want to exclude analysis of sites too close to each other (and so they would interfere with each other) we want to add a column to the data indicating distance to the neighboring site. 
 </p>
 <pre>
 perl <A HREF=AddDist.txt>AddDist.pl</A> CCGG_tags_18 &gt CCGG_tags_18_withdist
@@ -153,6 +153,12 @@ cat ../tags_from_sites/CCGG_tags_18_withdist | perl -ne '$rand=rand(); print "$r
 This is done with Unix "head" and "tail" to pull out a piece of the target sequence at a time, eg:
 <pre>
 head -32000 reads_all | tail -2000 > reads_subset
+</pre>
+<p>
+Or, if you have the unix command "split", you can create all your subset files with a single command:
+</p>
+<pre>
+split -l 2000 -d -a 4 CCGG_tags_18_withdist_shuffled
 </pre>
 <p>
 Once a subset is made, it is matched against the target library with the following steps:
