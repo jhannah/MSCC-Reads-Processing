@@ -7,8 +7,10 @@ $start = $ARGV[0];
 $end = $ARGV[1];
 $INCREMENT = $ARGV[2];
 
-my $file1 = "/home/pm23/CCGG_mouse/find_unique_tags/CCGG_tags_18_withdist_shuffled";
-my $file2 = "/home/pm23/CCGG_mouse/find_unique_tags/CCGG_tags_18_withdist_alphasort";
+my $base_dir = '/home/biocore/jhannah/src/MSCC-Reads-Processing';
+my $work_dir = "$base_dir/work";
+my $file1 =    "$work_dir/CCGG_tags_18_withdist_shuffled";
+my $file2 =    "$work_dir/CCGG_tags_18_withdist_alphasort";
 
 my $out = "CCGG_tags_18_upto2MM_${start}_${end}";
 
@@ -19,30 +21,31 @@ $variantfilename = $tagfilename . "_variants";
 $sortedvariantfilename = $variantfilename . "_sorted";
 $matchfilename = $tagfilename . "_matches";
 
+my $cmd;
 if ($end < $start + $INCREMENT) {
-  my $tail = $end - $start;
-  `time tail -$tail $file1 > /scratch/$tagfilename`;
+   my $tail = $end - $start;
+   $cmd = "tail -$tail $file1 > $work_dir/$tagfilename";
 } else {
-  `time head -$end $file1 | tail -$INCREMENT > /scratch/$tagfilename`;
+   $cmd = "head -$end $file1 | tail -$INCREMENT > $work_dir/$tagfilename";
 }
 
-print "/home/pm23/CCGG_mouse/find_unique_tags/GenerateVariants_3MM.pl /scratch/$tagfilename $MISMATCH > /scratch/$variantfilename\n";
-`time /home/pm23/CCGG_mouse/find_unique_tags/GenerateVariants_3MM.pl /scratch/$tagfilename $MISMATCH > /scratch/$variantfilename`;
-print "sort /scratch/$variantfilename > /scratch/$sortedvariantfilename\n";
-`time sort /scratch/$variantfilename > /scratch/$sortedvariantfilename`;
-print "rm /scratch/$variantfilename\n";
-`rm /scratch/$variantfilename`;
-print "join $file2 /scratch/$sortedvariantfilename > /scratch/$matchfilename\n";
-`time join $file2 /scratch/$sortedvariantfilename > /scratch/$matchfilename`;
-print "rm /scratch/$sortedvariantfilename\n";
-`rm /scratch/$sortedvariantfilename`;
-print "sort --key=9,9 --key=10n,10 --key=11,11 --key=17n,17 /scratch/$matchfilename > /scratch/${out}_sorted\n";
-`time sort --key=9,9 --key=10n,10 --key=11,11 --key=17n,17 /scratch/$matchfilename > /scratch/${out}_sorted`;
-print "/home/pm23/CCGG_mouse/find_unique_tags/CountMatches.pl /scratch/${out}_sorted > /scratch/${out}_counts\n";
-`time /home/pm23/CCGG_mouse/find_unique_tags/CountMatches.pl /scratch/${out}_sorted > /scratch/${out}_counts`;
-`cp /scratch/${out}_counts /home/pm23/CCGG_mouse/find_unique_tags/${out}_counts`;
+foreach my $cmd (
+   $cmd,
+   "$base_dir/GenerateVariants_3MM.pl $work_dir/$tagfilename $MISMATCH > $work_dir/$variantfilename",
+   "sort $work_dir/$variantfilename > $work_dir/$sortedvariantfilename",
+   "rm $work_dir/$variantfilename",
+   "join $file2 $work_dir/$sortedvariantfilename > $work_dir/$matchfilename",
+   "rm $work_dir/$sortedvariantfilename",
+   "sort --key=9,9 --key=10n,10 --key=11,11 --key=17n,17 $work_dir/$matchfilename > $work_dir/${out}_sorted",
+   "$base_dir/CountMatches.pl $work_dir/${out}_sorted > $work_dir/${out}_counts",
+   "cp $work_dir/${out}_counts /home/pm23/CCGG_mouse/find_unique_tags/${out}_counts",
+   "rm $work_dir/$tagfilename",
+   "rm $work_dir/$matchfilename",
+   "rm $work_dir/${out}_sorted",
+   "rm $work_dir/${out}_counts",
+) {
+   print "$cmd\n";
+   `time $cmd`;
+}
 
-`rm /scratch/$tagfilename`;
-`rm /scratch/$matchfilename`;
-`rm /scratch/${out}_sorted`;
-`rm /scratch/${out}_counts`;
+
