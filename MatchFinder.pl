@@ -12,14 +12,14 @@ my $work_dir = "$base_dir/work";
 my $file1 =    "$work_dir/CCGG_tags_18_withdist_shuffled";
 my $file2 =    "$work_dir/CCGG_tags_18_withdist_alphasort";
 
-my $out = "CCGG_tags_18_upto2MM_${start}_${end}";
+my $out = "$start.$end.CCGG_tags_18_upto2MM";
 
 my ($tagfilename, $variantfilename, $sortedvariantfilename, $matchfilename);
 
-$tagfilename = "reads_" . $start . "_" . $end;
-$variantfilename = $tagfilename . "_variants";
-$sortedvariantfilename = $variantfilename . "_sorted";
-$matchfilename = $tagfilename . "_matches";
+$tagfilename = "$start.$end.reads";
+$variantfilename = $tagfilename . ".variants";
+$sortedvariantfilename = $variantfilename . ".sorted";
+$matchfilename = $tagfilename . ".matches";
 
 my $cmd;
 if ($end < $start + $INCREMENT) {
@@ -36,13 +36,11 @@ foreach my $cmd (
    "rm $work_dir/$variantfilename",
    "join $file2 $work_dir/$sortedvariantfilename > $work_dir/$matchfilename",
    "rm $work_dir/$sortedvariantfilename",
-   "sort --key=9,9 --key=10n,10 --key=11,11 --key=17n,17 $work_dir/$matchfilename > $work_dir/${out}_sorted",
-   "$base_dir/CountMatches.pl $work_dir/${out}_sorted > $work_dir/${out}_counts",
-   "cp $work_dir/${out}_counts /home/pm23/CCGG_mouse/find_unique_tags/${out}_counts",
+   "sort --key=9,9 --key=10n,10 --key=11,11 --key=17n,17 $work_dir/$matchfilename > $work_dir/$out.sorted",
+   "$base_dir/CountMatches.pl $work_dir/$out.sorted > $work_dir/$out.counts",
    "rm $work_dir/$tagfilename",
    "rm $work_dir/$matchfilename",
-   "rm $work_dir/${out}_sorted",
-   "rm $work_dir/${out}_counts",
+   "rm $work_dir/$out.sorted",
 ) {
    print "$cmd\n";
    `time $cmd`;
